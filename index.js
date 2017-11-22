@@ -15,6 +15,9 @@ app.get('/', (req, res) => {
 });
 
 app.get('/api/films/readall', (req, res) => {
+  films.sort((x, y) => {
+    return x.position - y.position;
+  })
   res.send(films);    
 });
 
@@ -70,6 +73,7 @@ app.post('/api/films/update', (req, res) => {
     res.json(invId);
     return;
   }
+  req.position -=1;
   req.title ? film.title = req.title : null;
   req.rating ? film.rating = req.rating : null;
   req.budget ? film.budget = req.budget : null;
@@ -77,11 +81,20 @@ app.post('/api/films/update', (req, res) => {
   req.poster ? film.poster = req.poster : null;
   req.position ? film.position = req.position : null;
   req.year ? film.year = req.year : null;
-  films=films.map((element) => {
+  films=films.map((element) =>{     
     if(element.position >= film.position)
-      element.position++
-    return element;
+      element.position++;
+      return element;
   });
+  films.sort((x, y) => {
+    return x.position - y.position;
+  })
+  let pos = 1;
+  films.map((element) => {
+    if(element.position !== pos)
+      element.position = pos;
+    pos++;
+  })
   res.json(film);
 })
 
@@ -107,12 +120,6 @@ app.post('/api/films/delete', (req, res) => {
   })
   res.json(films);
 })
-
-function sortFilms(){
-  films.sort((x, y) => {
-      return x.position - y.position;
-  })
-}
 
 app.listen(3000, () => {
   console.log('Example app listening on port 3000!');
